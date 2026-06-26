@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineering Physics Lab - Interactive Learning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #7c3aed;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links button {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #cbd5e1;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .nav-links button:hover, .nav-links button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .main-container {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .section-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .section-header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card:hover::before { opacity: 1; }
+        
+        .card h3 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .input-group {
+            margin: 1rem 0;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.25rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .result-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .result-box.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        
+        .formula-display {
+            background: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            color: var(--warning);
+            margin: 1rem 0;
+            border-left: 3px solid var(--warning);
+        }
+        
+        .canvas-container {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        canvas {
+            width: 100%;
+            border-radius: 8px;
+            background: #0f172a;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .slider-container {
+            margin: 1rem 0;
+        }
+        
+        .slider-container input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.3;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .section-header h1 { font-size: 1.8rem; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .main-container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas class="particles" id="bgCanvas"></canvas>
+    
+    <nav class="navbar">
+        <div class="logo">⚛️ Engineering Physics Lab</div>
+        <ul class="nav-links">
+            <li><button class="active" onclick="showSection('home')">🏠 Home</button></li>
+            <li><button onclick="showSection('mechanics')">⚙️ Mechanics</button></li>
+            <li><button onclick="showSection('thermodynamics')">🌡️ Thermo</button></li>
+            <li><button onclick="showSection('electromagnetism')">⚡ EM Fields</button></li>
+            <li><button onclick="showSection('waves')">〰️ Waves</button></li>
+            <li><button onclick="showSection('modern')">🔬 Modern</button></li>
+            <li><button onclick="showSection('calculators')">🧮 Calc</button></li>
+            <li><button onclick="showSection('quiz')">📝 Quiz</button></li>
+        </ul>
+    </nav>
+
+    <div class="main-container">
+
+        <section id="home" class="section active">
+            <div class="section-header">
+                <h1>Welcome to Engineering Physics Lab</h1>
+                <p>Interactive simulations, calculators, and quizzes for mastering engineering physics</p>
+            </div>
+            
+            <div class="cards-grid">
+                <div class="card" onclick="showSection('mechanics')">
+                    <span class="card-icon">⚙️</span>
+                    <h3>Classical Mechanics</h3>
+                    <p>Projectile motion, pendulum dynamics, elastic collisions, and gravitational simulations with real-time visualization.</p>
+                </div>
+                
+                <div class="card" onclick="showSection('thermodynamics')">
+                    <span class="card-icon">🌡️</span>
+                    <h3>Thermodynamics</h3>
+                    <p>Ideal gas simulations, Carnot cycles, heat transfer calculations, and entropy analysis.</p>
+                </div>
+                
+                <div class="card" onclick="showSection('electromagnetism')">
+                    <span class="card-icon">⚡</span>
+                    <h3>Electromagnetism</h3>
+                    <p>Electric field visualizations, RC circuits, Lorentz force, and electromagnetic waves.</p>
+                </div>
+                
+                <div class="card" onclick="showSection('waves')">
+                    <span class="card-icon">〰️</span>
+                    <h3>Waves & Optics</h3>
+                    <p>Wave interference, double-slit patterns, lens optics, and Doppler effect.</p>
+                </div>
+                
+                <div class="card" onclick="showSection('modern')">
+                    <span class="card-icon">🔬</span>
+                    <h3>Modern Physics</h3>
+                    <p>Photoelectric effect, special relativity, radioactive decay, and quantum phenomena.</p>
+                </div>
+                
+                <div class="card" onclick="showSection('calculators')">
+                    <span class="card-icon">🧮</span>
+                    <h3>Physics Calculators</h3>
+                    <p>Unit converters, Ohm's law, energy calculators, and wave equation solvers.</p>
+                </div>
+            </div>
+            
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <h3>🎯 Ready to Test Your Knowledge?</h3>
+                <p style="margin: 1rem 0;">Take our comprehensive quiz covering all engineering physics topics with instant feedback.</p>
+                <button class="btn btn-primary" onclick="showSection('quiz')">Start Quiz Challenge</button>
+            </div>
+        </section>
+
+        <!-- MECHANICS SECTION -->
+        <section id="mechanics" class="section">
+            <div class="section-header">
+                <h1>⚙️ Classical Mechanics</h1>
+                <p>Interactive simulations for motion, forces, and energy</p>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('projectile')">Projectile Motion</div>
+                <div class="tab" onclick="showTab('pendulum')">Pendulum</div>
+                <div class="tab" onclick="showTab('collision')">Elastic Collision</div>
+                <div class="tab" onclick="showTab('gravity')">Gravitational Field</div>
+            </div>
+            
+            <!-- Projectile Motion -->
+            <div id="projectile" class="tab-content active">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🎯 Parameters</h3>
+                        <div class="input-group">
+                            <label>Initial Velocity (m/s)</label>
+                            <input type="number" id="proj-v0" value="50" min="1" max="200">
+                        </div>
+                        <div class="input-group">
+                            <label>Launch Angle (degrees)</label>
+                            <input type="number" id="proj-angle" value="45" min="0" max="90">
+                        </div>
+                        <div class="input-group">
+                            <label>Initial Height (m)</label>
+                            <input type="number" id="proj-h0" value="0" min="0" max="1000">
+                        </div>
+                        <div class="input-group">
+                            <label>Gravity (m/s²)</label>
+                            <input type="number" id="proj-g" value="9.81" step="0.01">
+                        </div>
+                        <button class="btn btn-primary" onclick="simulateProjectile()">Launch</button>
+                        <button class="btn btn-secondary" onclick="resetProjectile()">Reset</button>
+                        
+                        <div id="proj-result" class="result-box">
+                            <div>Max Height: <span class="result-value" id="proj-hmax">0</span> m</div>
+                            <div>Range: <span class="result-value" id="proj-range">0</span> m</div>
+                            <div>Flight Time: <span class="result-value" id="proj-time">0</span> s</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📊 Trajectory</h3>
+                        <div class="canvas-container">
+                            <canvas id="projCanvas" width="600" height="400"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            x = v₀·cos(θ)·t<br>
+                            y = h₀ + v₀·sin(θ)·t - ½gt²
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pendulum -->
+            <div id="pendulum" class="tab-content" style="display:none">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🕐 Pendulum Parameters</h3>
+                        <div class="slider-container">
+                            <label>Length (m): <span id="pend-l-val">2.0</span></label>
+                            <input type="range" id="pend-l" min="0.1" max="5" step="0.1" value="2" oninput="updatePendulum()">
+                        </div>
+                        <div class="slider-container">
+                            <label>Mass (kg): <span id="pend-m-val">1.0</span></label>
+                            <input type="range" id="pend-m" min="0.1" max="10" step="0.1" value="1" oninput="updatePendulum()">
+                        </div>
+                        <div class="slider-container">
+                            <label>Initial Angle (°): <span id="pend-a-val">30</span></label>
+                            <input type="range" id="pend-a" min="5" max="90" step="1" value="30" oninput="updatePendulum()">
+                        </div>
+                        <div class="slider-container">
+                            <label>Gravity (m/s²): <span id="pend-g-val">9.81</span></label>
+                            <input type="range" id="pend-g" min="1" max="20" step="0.1" value="9.81" oninput="updatePendulum()">
+                        </div>
+                        <button class="btn btn-primary" id="pend-toggle" onclick="togglePendulum()">▶ Start</button>
+                        
+                        <div class="result-box show">
+                            <div>Period: <span class="result-value" id="pend-period">2.84</span> s</div>
+                            <div>Frequency: <span class="result-value" id="pend-freq">0.35</span> Hz</div>
+                            <div>Max Velocity: <span class="result-value" id="pend-vmax">2.29</span> m/s</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📐 Pendulum Visualization</h3>
+                        <div class="canvas-container">
+                            <canvas id="pendCanvas" width="400" height="400"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            T = 2π√(L/g)<br>
+                            ω = √(g/L)<br>
+                            v_max = ω·A·L
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Elastic Collision -->
+            <div id="collision" class="tab-content" style="display:none">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>💥 Collision Parameters</h3>
+                        <div class="input-group">
+                            <label>Mass 1 (kg)</label>
+                            <input type="number" id="col-m1" value="2" min="0.1" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>Velocity 1 (m/s)</label>
+                            <input type="number" id="col-v1" value="5" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>Mass 2 (kg)</label>
+                            <input type="number" id="col-m2" value="3" min="0.1" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>Velocity 2 (m/s)</label>
+                            <input type="number" id="col-v2" value="-2" step="0.1">
+                        </div>
+                        <button class="btn btn-primary" onclick="simulateCollision()">Simulate</button>
+                        <button class="btn btn-secondary" onclick="resetCollision()">Reset</button>
+                        
+                        <div id="col-result" class="result-box">
+                            <div>Final v₁: <span class="result-value" id="col-v1f">0</span> m/s</div>
+                            <div>Final v₂: <span class="result-value" id="col-v2f">0</span> m/s</div>
+                            <div>Kinetic Energy: <span class="result-value" id="col-ke">0</span> J</div>
+                            <div>Momentum: <span class="result-value" id="col-p">0</span> kg·m/s</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>🎱 Collision Visualization</h3>
+                        <div class="canvas-container">
+                            <canvas id="colCanvas" width="600" height="200"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            v₁' = [(m₁-m₂)v₁ + 2m₂v₂]/(m₁+m₂)<br>
+                            v₂' = [(m₂-m₁)v₂ + 2m₁v₁]/(m₁+m₂)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gravitational Field -->
+            <div id="gravity" class="tab-content" style="display:none">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🌍 Gravitational Parameters</h3>
+                        <div class="input-group">
+                            <label>Mass 1 (kg)</label>
+                            <input type="number" id="grav-m1" value="1000" min="1">
+                        </div>
+                        <div class="input-group">
+                            <label>Mass 2 (kg)</label>
+                            <input type="number" id="grav-m2" value="1000" min="1">
+                        </div>
+                        <div class="input-group">
+                            <label>Distance (m)</label>
+                            <input type="number" id="grav-r" value="10" min="0.1" step="0.1">
+                        </div>
+                        <button class="btn btn-primary" onclick="calculateGravity()">Calculate</button>
+                        
+                        <div id="grav-result" class="result-box">
+                            <div>Force: <span class="result-value" id="grav-f">0</span> N</div>
+                            <div>Field Strength: <span class="result-value" id="grav-g">0</span> N/kg</div>
+                            <div>Potential Energy: <span class="result-value" id="grav-u">0</span> J</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>🌌 Field Visualization</h3>
+                        <div class="canvas-container">
+                            <canvas id="gravCanvas" width="400" height="400"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            F = G·m₁·m₂/r²<br>
+                            g = G·M/r²<br>
+                            U = -G·m₁·m₂/r
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- THERMODYNAMICS SECTION -->
+        <section id="thermodynamics" class="section">
+            <div class="section-header">
+                <h1>🌡️ Thermodynamics</h1>
+                <p>Heat, work, entropy, and engine cycles</p>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('ideal-gas')">Ideal Gas</div>
+                <div class="tab" onclick="showTab('carnot')">Carnot Cycle</div>
+                <div class="tab" onclick="showTab('heat-transfer')">Heat Transfer</div>
+            </div>
+            
+            <!-- Ideal Gas -->
+            <div id="ideal-gas" class="tab-content active">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🎈 Gas Properties</h3>
+                        <div class="input-group">
+                            <label>Pressure (Pa)</label>
+                            <input type="number" id="gas-p" value="101325" min="1">
+                        </div>
+                        <div class="input-group">
+                            <label>Volume (m³)</label>
+                            <input type="number" id="gas-v" value="0.0224" min="0.001" step="0.001">
+                        </div>
+                        <div class="input-group">
+                            <label>Temperature (K)</label>
+                            <input type="number" id="gas-t" value="273" min="1">
+                        </div>
+                        <div class="input-group">
+                            <label>Moles (mol)</label>
+                            <input type="number" id="gas-n" value="1" min="0.001" step="0.001">
+                        </div>
+                        <div class="input-group">
+                            <label>Gas Type</label>
+                            <select id="gas-type" onchange="updateGasType()">
+                                <option value="8.314">General (R = 8.314)</option>
+                                <option value="20.8">Monatomic (Cv = 3/2 R)</option>
+                                <option value="29.1">Diatomic (Cv = 5/2 R)</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="calculateGas()">Calculate</button>
+                        
+                        <div id="gas-result" class="result-box">
+                            <div>Internal Energy: <span class="result-value" id="gas-u">0</span> J</div>
+                            <div>Work Done: <span class="result-value" id="gas-w">0</span> J</div>
+                            <div>Heat Transfer: <span class="result-value" id="gas-q">0</span> J</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📊 P-V Diagram</h3>
+                        <div class="canvas-container">
+                            <canvas id="gasCanvas" width="400" height="400"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            PV = nRT<br>
+                            ΔU = nCvΔT<br>
+                            Q = ΔU + W
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Carnot Cycle -->
+            <div id="carnot" class="tab-content" style="display:none">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>♻️ Carnot Engine</h3>
+                        <div class="slider-container">
+                            <label>Hot Reservoir T₁ (K): <span id="carnot-t1-val">600</span></label>
+                            <input type="range" id="carnot-t1" min="300" max="1000" value="600" oninput="updateCarnot()">
+                        </div>
+                        <div class="slider-container">
+                            <label>Cold Reservoir T₂ (K): <span id="carnot-t2-val">300</span></label>
+                            <input type="range" id="carnot-t2" min="100" max="500" value="300" oninput="updateCarnot()">
+                        </div>
+                        <div class="input-group">
+                            <label>Heat Input Q₁ (J)</label>
+                            <input type="number" id="carnot-q1" value="1000" min="1">
+                        </div>
+                        <button class="btn btn-primary" onclick="calculateCarnot()">Calculate</button>
+                        
+                        <div class="result-box show">
+                            <div>Efficiency η: <span class="result-value" id="carnot-eff">50</span>%</div>
+                            <div>Work Output: <span class="result-value" id="carnot-w">500</span> J</div>
+                            <div>Heat Rejected: <span class="result-value" id="carnot-q2">500</span> J</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📈 Carnot Cycle</h3>
+                        <div class="canvas-container">
+                            <canvas id="carnotCanvas" width="400" height="400"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            η = 1 - T₂/T₁<br>
+                            W = Q₁ - Q₂<br>
+                            Q₂/Q₁ = T₂/T₁
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Heat Transfer -->
+            <div id="heat-transfer" class="tab-content" style="display:none">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🔥 Heat Transfer</h3>
+                        <div class="input-group">
+                            <label>Mode</label>
+                            <select id="heat-mode" onchange="updateHeatMode()">
+                                <option value="conduction">Conduction</option>
+                                <option value="convection">Convection</option>
+                                <option value="radiation">Radiation</option>
+                            </select>
+                        </div>
+                        <div id="heat-inputs">
+                            <div class="input-group">
+                                <label>Thermal Conductivity k (W/m·K)</label>
+                                <input type="number" id="heat-k" value="401" min="0.001">
+                            </div>
+                            <div class="input-group">
+                                <label>Area A (m²)</label>
+                                <input type="number" id="heat-a" value="1" min="0.001">
+                            </div>
+                            <div class="input-group">
+                                <label>Thickness d (m)</label>
+                                <input type="number" id="heat-d" value="0.01" min="0.0001" step="0.0001">
+                            </div>
+                            <div class="input-group">
+                                <label>ΔT (K)</label>
+                                <input type="number" id="heat-dt" value="100" min="0.001">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="calculateHeat()">Calculate</button>
+                        
+                        <div id="heat-result" class="result-box">
+                            <div>Heat Rate Q̇: <span class="result-value" id="heat-q">0</span> W</div>
+                            <div>Heat Flux: <span class="result-value" id="heat-flux">0</span> W/m²</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📊 Temperature Profile</h3>
+                        <div class="canvas-container">
+                            <canvas id="heatCanvas" width="400" height="300"></canvas>
+                        </div>
+                        <div class="formula-display" id="heat-formula">
+                            Q̇ = k·A·ΔT/d (Fourier's Law)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ELECTROMAGNETISM SECTION -->
+        <section id="electromagnetism" class="section">
+            <div class="section-header">
+                <h1>⚡ Electromagnetism</h1>
+                <p>Fields, circuits, and electromagnetic forces</p>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('electric-field')">Electric Field</div>
+                <div class="tab" onclick="showTab('rc-circuit')">RC Circuit</div>
+                <div class="tab" onclick="showTab('lorentz')">Lorentz Force</div>
+            </div>
+            
+            <!-- Electric Field -->
+            <div id="electric-field" class="tab-content active">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>⚡ Point Charge</h3>
+                        <div class="input-group">
+                            <label>Charge Q (μC)</label>
+                            <input type="number" id="ef-q" value="1" min="-1000" max="1000" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>Distance r (m)</label>
+                            <input type="number" id="ef-r" value="1" min="0.01" step="0.01">
+                        </div>
+                        <button class="btn btn-primary" onclick="calculateEField()">Calculate</button>
+                        
+                        <div id="ef-result" class="result-box">
+                            <div>Electric Field: <span class="result-value" id="ef-e">0</span> N/C</div>
+                            <div>Potential: <span class="result-value" id="ef-v">0</span> V</div>
+                            <div>Force on 1μC: <span class="result-value" id="ef-f">0</span> N</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>🌐 Field Visualization</h3>
+                        <div class="canvas-container">
+                            <canvas id="efCanvas" width="400" height="400"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            E = kQ/r²<br>
+                            V = kQ/r<br>
+                            F = qE
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RC Circuit -->
+            <div id="rc-circuit" class="tab-content" style="display:none">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🔋 RC Circuit</h3>
+                        <div class="input-group">
+                            <label>Voltage V (V)</label>
+                            <input type="number" id="rc-v" value="12" min="0.1" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>Resistance R (Ω)</label>
+                            <input type="number" id="rc-r" value="1000" min="1">
+                        </div>
+                        <div class="input-group">
+                            <label>Capacitance C (μF)</label>
+                            <input type="number" id="rc-c" value="100" min="0.1" step="0.1">
+                        </div>
+                        <button class="btn btn-primary" onclick="simulateRC()">Simulate</button>
+                        <button class="btn btn-secondary" onclick="resetRC()">Reset</button>
+                        
+                        <div class="result-box show">
+                            <div>Time Constant τ: <span class="result-value" id="rc-tau">0.1</span> s</div>
+                            <div>Max Charge: <span class="result-value" id="rc-qmax">1.2</span> mC</div>
+                            <div>Max Current: <span class="result-value" id="rc-imax">12</span> mA</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📈 Charging Curve</h3>
+                        <div class="canvas-container">
+                            <canvas id="rcCanvas" width="600" height="300"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            q(t) = Q_max(1 - e^(-t/τ))<br>
+                            i(t) = I_max·e^(-t/τ)<br>
+                            τ = RC
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lorentz Force -->
+            <div id="lorentz" class="tab-content" style="display:none">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🧲 Lorentz Force</h3>
+                        <div class="input-group">
+                            <label>Charge q (μC)</label>
+                            <input type="number" id="lor-q" value="1" min="-1000" max="1000" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>Velocity v (m/s)</label>
+                            <input type="number" id="lor-v" value="1000" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Magnetic Field B (T)</label>
+                            <input type="number" id="lor-b" value="0.5" min="0" step="0.01">
+                        </div>
+                        <div class="input-group">
+                            <label>Angle θ (°)</label>
+                            <input type="number" id="lor-theta" value="90" min="0" max="180">
+                        </div>
+                        <button class="btn btn-primary" onclick="calculateLorentz()">Calculate</button>
+                        
+                        <div id="lor-result" class="result-box">
+                            <div>Force F: <span class="result-value" id="lor-f">0</span> N</div>
+                            <div>Radius: <span class="result-value" id="lor-r">0</span> m</div>
+                            <div>Period: <span class="result-value" id="lor-t">0</span> s</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>🔄 Motion in B-Field</h3>
+                        <div class="canvas-container">
+                            <canvas id="lorCanvas" width="400" height="400"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            F = qvB·sin(θ)<br>
+                            r = mv/(qB)<br>
+                            T = 2πm/(qB)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- WAVES SECTION -->
+        <section id="waves" class="section">
+            <div class="section-header">
+                <h1>〰️ Waves & Optics</h1>
+                <p>Wave phenomena, interference, and optical systems</p>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('wave-sim')">Wave Simulator</div>
+                <div class="tab" onclick="showTab('interference')">Interference</div>
+                <div class="tab" onclick="showTab('lens')">Lens Optics</div>
+            </div>
+            
+            <!-- Wave Simulator -->
+            <div id="wave-sim" class="tab-content active">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🌊 Wave Parameters</h3>
+                        <div class="slider-container">
+                            <label>Amplitude A (m): <span id="wave-a-val">1</span></label>
+                            <input type="range" id="wave-a" min="0.1" max="5" step="0.1" value="1" oninput="updateWave()">
+                        </div>
+                        <div class="slider-container">
+                            <label>Frequency f (Hz): <span id="wave-f-val">1</span></label>
+                            <input type="range" id="wave-f" min="0.1" max="5" step="0.1" value="1" oninput="updateWave()">
+                        </div>
+                        <div class="slider-container">
+                            <label>Wavelength λ (m): <span id="wave-l-val">2</span></label>
+                            <input type="range" id="wave-l" min="0.5" max="10" step="0.1" value="2" oninput="updateWave()">
+                        </div>
+                        <button class="btn btn-primary" id="wave-toggle" onclick="toggleWave()">▶ Animate</button>
+                        
+                        <div class="result-box show">
+                            <div>Wave Speed: <span class="result-value" id="wave-v">2</span> m/s</div>
+                            <div>Angular Freq: <span class="result-value" id="wave-omega">6.28</span> rad/s</div>
+                            <div>Wave Number: <span class="result-value" id="wave-k">3.14</span> rad/m</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📐 Wave Visualization</h3>
+                        <div class="canvas-container">
+                            <canvas id="waveCanvas" width="600" height="300"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            y = A·sin(kx - ωt)<br>
+                            v = f·λ<br>
+                            k = 2π/λ, ω = 2πf
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Interference -->
+            <div id="interference" class="tab-content" style="display:none">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🌈 Double Slit</h3>
+                        <div class="input-group">
+                            <label>Wavelength λ (nm)</label>
+                            <input type="number" id="int-lambda" value="500" min="380" max="750">
+                        </div>
+                        <div class="input-group">
+                            <label>Slit Separation d (μm)</label>
+                            <input type="number" id="int-d" value="2" min="0.1" max="10" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>Screen Distance L (m)</label>
+                            <input type="number" id="int-l" value="1" min="0.1" max="5" step="0.1">
+                        </div>
+                        <button class="btn btn-primary" onclick="calculateInterference()">Calculate</button>
+                        
+                        <div id="int-result" class="result-box">
+                            <div>Fringe Spacing: <span class="result-value" id="int-spacing">0.25</span> mm</div>
+                            <div>1st Max Angle: <span class="result-value" id="int-angle">14.5</span>°</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📊 Interference Pattern</h3>
+                        <div class="canvas-container">
+                            <canvas id="intCanvas" width="600" height="300"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            d·sin(θ) = mλ<br>
+                            Δy = λL/d<br>
+                            I = 4I₀cos²(πd·sin(θ)/λ)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lens Optics -->
+            <div id="lens" class="tab-content" style="display:none">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🔍 Thin Lens</h3>
+                        <div class="input-group">
+                            <label>Focal Length f (cm)</label>
+                            <input type="number" id="lens-f" value="10" min="-50" max="50" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>Object Distance u (cm)</label>
+                            <input type="number" id="lens-u" value="30" min="1" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>Object Height h (cm)</label>
+                            <input type="number" id="lens-h" value="2" min="0.1" step="0.1">
+                        </div>
+                        <button class="btn btn-primary" onclick="calculateLens()">Calculate Image</button>
+                        
+                        <div id="lens-result" class="result-box">
+                            <div>Image Distance: <span class="result-value" id="lens-v">0</span> cm</div>
+                            <div>Magnification: <span class="result-value" id="lens-m">0</span></div>
+                            <div>Image Height: <span class="result-value" id="lens-hi">0</span> cm</div>
+                            <div>Nature: <span class="result-value" id="lens-nature">-</span></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📐 Ray Diagram</h3>
+                        <div class="canvas-container">
+                            <canvas id="lensCanvas" width="600" height="300"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            1/f = 1/u + 1/v<br>
+                            m = -v/u = h'/h
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODERN PHYSICS SECTION -->
+        <section id="modern" class="section">
+            <div class="section-header">
+                <h1>🔬 Modern Physics</h1>
+                <p>Quantum mechanics, relativity, and nuclear physics</p>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('photoelectric')">Photoelectric</div>
+                <div class="tab" onclick="showTab('relativity')">Relativity</div>
+                <div class="tab" onclick="showTab('radioactive')">Radioactive Decay</div>
+            </div>
+            
+            <!-- Photoelectric Effect -->
+            <div id="photoelectric" class="tab-content active">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>💡 Photoelectric Effect</h3>
+                        <div class="input-group">
+                            <label>Metal Work Function φ (eV)</label>
+                            <select id="photo-metal" onchange="updatePhotoMetal()">
+                                <option value="2.14">Cesium (2.14 eV)</option>
+                                <option value="2.30">Potassium (2.30 eV)</option>
+                                <option value="2.75">Sodium (2.75 eV)</option>
+                                <option value="4.26">Copper (4.26 eV)</option>
+                                <option value="4.50">Zinc (4.50 eV)</option>
+                                <option value="5.10">Platinum (5.10 eV)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Light Wavelength λ (nm)</label>
+                            <input type="number" id="photo-lambda" value="400" min="100" max="1000">
+                        </div>
+                        <div class="input-group">
+                            <label>Light Intensity (W/m²)</label>
+                            <input type="number" id="photo-i" value="100" min="1">
+                        </div>
+                        <button class="btn btn-primary" onclick="calculatePhotoelectric()">Calculate</button>
+                        
+                        <div id="photo-result" class="result-box">
+                            <div>Photon Energy: <span class="result-value" id="photo-e">0</span> eV</div>
+                            <div>Max KE: <span class="result-value" id="photo-ke">0</span> eV</div>
+                            <div>Cutoff λ: <span class="result-value" id="photo-cutoff">0</span> nm</div>
+                            <div>Stopping Potential: <span class="result-value" id="photo-vs">0</span> V</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📊 Energy Diagram</h3>
+                        <div class="canvas-container">
+                            <canvas id="photoCanvas" width="400" height="300"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            E = hc/λ<br>
+                            KE_max = hν - φ<br>
+                            eV₀ = KE_max
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Relativity -->
+            <div id="relativity" class="tab-content" style="display:none">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>⏱️ Special Relativity</h3>
+                        <div class="slider-container">
+                            <label>Velocity v (fraction of c): <span id="rel-v-val">0.6</span></label>
+                            <input type="range" id="rel-v" min="0" max="0.99" step="0.01" value="0.6" oninput="updateRelativity()">
+                        </div>
+                        <div class="input-group">
+                            <label>Rest Mass m₀ (kg)</label>
+                            <input type="number" id="rel-m0" value="1" min="0.001" step="0.001">
+                        </div>
+                        <div class="input-group">
+                            <label>Proper Time Δt₀ (s)</label>
+                            <input type="number" id="rel-t0" value="1" min="0.001" step="0.001">
+                        </div>
+                        <div class="input-group">
+                            <label>Proper Length L₀ (m)</label>
+                            <input type="number" id="rel-l0" value="10" min="0.001" step="0.001">
+                        </div>
+                        <button class="btn btn-primary" onclick="calculateRelativity()">Calculate</button>
+                        
+                        <div id="rel-result" class="result-box">
+                            <div>Lorentz Factor γ: <span class="result-value" id="rel-gamma">1.25</span></div>
+                            <div>Relativistic Mass: <span class="result-value" id="rel-m">1.25</span> kg</div>
+                            <div>Time Dilation: <span class="result-value" id="rel-t">1.25</span> s</div>
+                            <div>Length Contraction: <span class="result-value" id="rel-l">8.00</span> m</div>
+                            <div>Total Energy: <span class="result-value" id="rel-e">1.125e17</span> J</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📈 Relativistic Effects</h3>
+                        <div class="canvas-container">
+                            <canvas id="relCanvas" width="400" height="300"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            γ = 1/√(1-v²/c²)<br>
+                            t = γ·t₀, L = L₀/γ<br>
+                            E = γ·m₀c²
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Radioactive Decay -->
+            <div id="radioactive" class="tab-content" style="display:none">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>☢️ Decay Calculator</h3>
+                        <div class="input-group">
+                            <label>Isotope</label>
+                            <select id="radio-isotope" onchange="updateIsotope()">
+                                <option value="5730">Carbon-14 (5730 years)</option>
+                                <option value="4.468e9">Uranium-238 (4.468 Gy)</option>
+                                <option value="7.04e8">Uranium-235 (704 My)</option>
+                                <option value="1.6e9">Potassium-40 (1.6 Gy)</option>
+                                <option value="5.27">Cobalt-60 (5.27 years)</option>
+                                <option value="12.3">Tritium (12.3 years)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Initial Amount N₀</label>
+                            <input type="number" id="radio-n0" value="100" min="1">
+                        </div>
+                        <div class="input-group">
+                            <label>Time Elapsed</label>
+                            <input type="number" id="radio-t" value="5730" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Time Unit</label>
+                            <select id="radio-unit">
+                                <option value="1">Years</option>
+                                <option value="365">Days</option>
+                                <option value="8760">Hours</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="calculateDecay()">Calculate</button>
+                        
+                        <div id="radio-result" class="result-box">
+                            <div>Remaining: <span class="result-value" id="radio-n">50</span></div>
+                            <div>Decayed: <span class="result-value" id="radio-decayed">50</span></div>
+                            <div>Half-lives: <span class="result-value" id="radio-hl">1.00</span></div>
+                            <div>Decay Constant: <span class="result-value" id="radio-lambda">1.21e-4</span> /year</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📉 Decay Curve</h3>
+                        <div class="canvas-container">
+                            <canvas id="radioCanvas" width="400" height="300"></canvas>
+                        </div>
+                        <div class="formula-display">
+                            N = N₀·e^(-λt)<br>
+                            λ = ln(2)/T½<br>
+                            t½ = ln(2)/λ
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CALCULATORS SECTION -->
+        <section id="calculators" class="section">
+            <div class="section-header">
+                <h1>🧮 Physics Calculators</h1>
+                <p>Essential tools for engineering physics problems</p>
+            </div>
+            
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>📐 Unit Converter</h3>
+                    <div class="input-group">
+                        <label>Category</label>
+                        <select id="conv-cat" onchange="updateConverter()">
+                            <option value="length">Length</option>
+                            <option value="mass">Mass</option>
+                            <option value="time">Time</option>
+                            <option value="temp">Temperature</option>
+                            <option value="energy">Energy</option>
+                            <option value="pressure">Pressure</option>
+                            <option value="power">Power</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>From</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="number" id="conv-val" value="1" style="flex: 1;">
+                            <select id="conv-from" style="width: 120px;"></select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>To</label>
+                        <select id="conv-to"></select>
+                    </div>
+                    <button class="btn btn-primary" onclick="convert()">Convert</button>
+                    <div id="conv-result" class="result-box">
+                        <div>Result: <span class="result-value" id="conv-out">1</span></div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>⚡ Ohm's Law</h3>
+                    <div class="input-group">
+                        <label>Voltage V (V)</label>
+                        <input type="number" id="ohm-v" placeholder="?" oninput="calcOhm('v')">
+                    </div>
+                    <div class="input-group">
+                        <label>Current I (A)</label>
+                        <input type="number" id="ohm-i" placeholder="?" oninput="calcOhm('i')">
+                    </div>
+                    <div class="input-group">
+                        <label>Resistance R (Ω)</label>
+                        <input type="number" id="ohm-r" placeholder="?" oninput="calcOhm('r')">
+                    </div>
+                    <div class="input-group">
+                        <label>Power P (W)</label>
+                        <input type="number" id="ohm-p" placeholder="?" oninput="calcOhm('p')">
+                    </div>
+                    <div class="formula-display">
+                        V = IR, P = VI = I²R = V²/R
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>🌊 Wave Calculator</h3>
+                    <div class="input-group">
+                        <label>Wavelength λ (m)</label>
+                        <input type="number" id="calc-lambda" placeholder="?" oninput="calcWave('lambda')">
+                    </div>
+                    <div class="input-group">
+                        <label>Frequency f (Hz)</label>
+                        <input type="number" id="calc-f" placeholder="?" oninput="calcWave('f')">
+                    </div>
+                    <div class="input-group">
+                        <label>Wave Speed v (m/s)</label>
+                        <input type="number" id="calc-v" placeholder="?" oninput="calcWave('v')">
+                    </div>
+                    <div class="input-group">
+                        <label>Period T (s)</label>
+                        <input type="number" id="calc-t" placeholder="?" oninput="calcWave('t')">
+                    </div>
+                    <div class="formula-display">
+                        v = fλ, T = 1/f
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>🔋 Energy Calculator</h3>
+                    <div class="input-group">
+                        <label>Kinetic Energy (J)</label>
+                        <input type="number" id="en-ke" placeholder="?" oninput="calcEnergy('ke')">
+                    </div>
+                    <div class="input-group">
+                        <label>Potential Energy (J)</label>
+                        <input type="number" id="en-pe" placeholder="?" oninput="calcEnergy('pe')">
+                    </div>
+                    <div class="input-group">
+                        <label>Mass (kg)</label>
+                        <input type="number" id="en-m" placeholder="?" oninput="calcEnergy('m')">
+                    </div>
+                    <div class="input-group">
+                        <label>Velocity (m/s)</label>
+                        <input type="number" id="en-v" placeholder="?" oninput="calcEnergy('v')">
+                    </div>
+                    <div class="input-group">
+                        <label>Height (m)</label>
+                        <input type="number" id="en-h" placeholder="?" oninput="calcEnergy('h')">
+                    </div>
+                    <div class="formula-display">
+                        KE = ½mv², PE = mgh
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>🧲 Magnetic Force</h3>
+                    <div class="input-group">
+                        <label>Force F (N)</label>
+                        <input type="number" id="mag-f" placeholder="?" oninput="calcMag('f')">
+                    </div>
+                    <div class="input-group">
+                        <label>Current I (A)</label>
+                        <input type="number" id="mag-i" placeholder="?" oninput="calcMag('i')">
+                    </div>
+                    <div class="input-group">
+                        <label>Length L (m)</label>
+                        <input type="number" id="mag-l" placeholder="?" oninput="calcMag('l')">
+                    </div>
+                    <div class="input-group">
+                        <label>Field B (T)</label>
+                        <input type="number" id="mag-b" placeholder="?" oninput="calcMag('b')">
+                    </div>
+                    <div class="formula-display">
+                        F = BIL (wire), F = qvB (charge)
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>🌡️ Thermal Expansion</h3>
+                    <div class="input-group">
+                        <label>Initial Length L₀ (m)</label>
+                        <input type="number" id="therm-l0" value="1" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Temp Change ΔT (°C)</label>
+                        <input type="number" id="therm-dt" value="100">
+                    </div>
+                    <div class="input-group">
+                        <label>Material</label>
+                        <select id="therm-mat" onchange="calcThermal()">
+                            <option value="12e-6">Steel (12×10⁻⁶ /°C)</option>
+                            <option value="23e-6">Aluminum (23×10⁻⁶ /°C)</option>
+                            <option value="19e-6">Copper (19×10⁻⁶ /°C)</option>
+                            <option value="9e-6">Glass (9×10⁻⁶ /°C)</option>
+                            <option value="29e-6">Brass (29×10⁻⁶ /°C)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="calcThermal()">Calculate</button>
+                    <div id="therm-result" class="result-box">
+                        <div>ΔL: <span class="result-value" id="therm-dl">0</span> m</div>
+                        <div>Final Length: <span class="result-value" id="therm-l">0</span> m</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUIZ SECTION -->
+        <section id="quiz" class="section">
+            <div class="section-header">
+                <h1>📝 Physics Challenge</h1>
+                <p>Test your knowledge across all engineering physics topics</p>
+            </div>
+            
+            <div id="quiz-start" class="card" style="text-align: center; max-width: 600px; margin: 0 auto;">
+                <h2>🏆 Ready for the Challenge?</h2>
+                <p style="margin: 1rem 0;">10 questions covering Mechanics, Thermodynamics, Electromagnetism, Waves, and Modern Physics.</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; margin: 1.5rem 0;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem;">⚙️</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Mechanics</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem;">🌡️</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Thermo</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem;">⚡</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">EM</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem;">〰️</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Waves</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem;">🔬</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Modern</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+            </div>
+            
+            <div id="quiz-container" class="quiz-container" style="display: none;">
+                <div class="progress-container">
+                    <div class="progress-bar" id="quiz-progress" style="width: 0%"></div>
+                </div>
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    Question <span id="q-current">1</span> of <span id="q-total">10</span>
+                </div>
+                
+                <div id="question-card" class="question-card">
+                    <div class="question-text" id="q-text">Loading...</div>
+                    <div class="options-grid" id="q-options"></div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <button class="btn btn-primary" id="q-next" onclick="nextQuestion()" disabled>Next Question →</button>
+                </div>
+            </div>
+            
+            <div id="quiz-result" class="card" style="display: none; text-align: center; max-width: 600px; margin: 0 auto;">
+                <h2>🎉 Quiz Complete!</h2>
+                <div style="width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(var(--success) calc(var(--score) * 3.6deg), rgba(255,255,255,0.1) 0); display: flex; align-items: center; justify-content: center; margin: 2rem auto; position: relative;">
+                    <div style="width: 120px; height: 120px; background: var(--dark); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 2.5rem; font-weight: 800; color: var(--accent);" id="score-display">0/10</span>
+                    </div>
+                </div>
+                <p id="score-message" style="font-size: 1.2rem; margin-bottom: 1rem;"></p>
+                <button class="btn btn-primary" onclick="restartQuiz()">Try Again</button>
+                <button class="btn btn-secondary" onclick="showSection('home')">Back to Home</button>
+            </div>
+        </section>
+    </div>
+    <script>
+              // ===== NAVIGATION =====
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            window.scrollTo(0, 0);
+        }
+        
+        function showTab(tabId) {
+            const parent = event.target.closest('.section');
+            parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            parent.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.getElementById(tabId).style.display = 'block';
+        }
+        
+        // ===== PROJECTILE MOTION =====
+        let projAnim = null;
+        function simulateProjectile() {
+            const v0 = parseFloat(document.getElementById('proj-v0').value);
+            const angle = parseFloat(document.getElementById('proj-angle').value) * Math.PI / 180;
+            const h0 = parseFloat(document.getElementById('proj-h0').value);
+            const g = parseFloat(document.getElementById('proj-g').value);
+            
+            const vx = v0 * Math.cos(angle);
+            const vy = v0 * Math.sin(angle);
+            const tFlight = (vy + Math.sqrt(vy*vy + 2*g*h0)) / g;
+            const hMax = h0 + vy*vy / (2*g);
+            const range = vx * tFlight;
+            
+            document.getElementById('proj-hmax').textContent = hMax.toFixed(2);
+            document.getElementById('proj-range').textContent = range.toFixed(2);
+            document.getElementById('proj-time').textContent = tFlight.toFixed(2);
+            document.getElementById('proj-result').classList.add('show');
+            
+            const canvas = document.getElementById('projCanvas');
+            const ctx = canvas.getContext('2d');
+            const scale = Math.min(500/range, 300/hMax) * 0.8;
+            
+            let t = 0;
+            if (projAnim) cancelAnimationFrame(projAnim);
+            
+            function draw() {
+                ctx.clearRect(0, 0, 600, 400);
+                ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 600, 400);
+                
+                ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(0, 380); ctx.lineTo(600, 380); ctx.stroke();
+                
+                ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let i = 0; i <= t; i += 0.05) {
+                    const x = 50 + vx * i * scale;
+                    const y = 380 - (h0 + vy * i - 0.5 * g * i * i) * scale;
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                
+                const bx = 50 + vx * t * scale;
+                const by = 380 - (h0 + vy * t - 0.5 * g * t * t) * scale;
+                ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(bx, by, 8, 0, Math.PI*2); ctx.fill();
+                
+                ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2;
+                const vxt = vx, vyt = vy - g*t;
+                ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + vxt*0.5, by - vyt*0.5); ctx.stroke();
+                
+                t += 0.05;
+                if (t <= tFlight) projAnim = requestAnimationFrame(draw);
+            }
+            draw();
+        }
+        
+        function resetProjectile() {
+            if (projAnim) cancelAnimationFrame(projAnim);
+            document.getElementById('proj-result').classList.remove('show');
+            const canvas = document.getElementById('projCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 600, 400);
+        }
+        
+        // ===== PENDULUM =====
+        let pendAnim = null, pendRunning = false;
+        function updatePendulum() {
+            const L = parseFloat(document.getElementById('pend-l').value);
+            const a = parseFloat(document.getElementById('pend-a').value);
+            const g = parseFloat(document.getElementById('pend-g').value);
+            
+            document.getElementById('pend-l-val').textContent = L.toFixed(1);
+            document.getElementById('pend-m-val').textContent = document.getElementById('pend-m').value;
+            document.getElementById('pend-a-val').textContent = a;
+            document.getElementById('pend-g-val').textContent = g.toFixed(2);
+            
+            const T = 2 * Math.PI * Math.sqrt(L/g);
+            const f = 1/T;
+            const vmax = (a * Math.PI/180) * Math.sqrt(g*L);
+            
+            document.getElementById('pend-period').textContent = T.toFixed(2);
+            document.getElementById('pend-freq').textContent = f.toFixed(2);
+            document.getElementById('pend-vmax').textContent = vmax.toFixed(2);
+            
+            drawPendulumFrame(0);
+        }
+        
+        function drawPendulumFrame(time) {
+            const canvas = document.getElementById('pendCanvas');
+            const ctx = canvas.getContext('2d');
+            const L = parseFloat(document.getElementById('pend-l').value);
+            const a0 = parseFloat(document.getElementById('pend-a').value) * Math.PI/180;
+            const g = parseFloat(document.getElementById('pend-g').value);
+            const m = parseFloat(document.getElementById('pend-m').value);
+            
+            const omega = Math.sqrt(g/L);
+            const theta = a0 * Math.cos(omega * time);
+            
+            ctx.clearRect(0, 0, 400, 400);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 400, 400);
+            
+            const cx = 200, cy = 50;
+            const scale = 60;
+            const px = cx + L * scale * Math.sin(theta);
+            const py = cy + L * scale * Math.cos(theta);
+            
+            ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(px, py); ctx.stroke();
+            
+            const radius = 10 + m * 3;
+            ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(px, py, radius, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#06b6d4'; ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI*2); ctx.fill();
+            
+            ctx.strokeStyle = 'rgba(6, 182, 212, 0.2)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.arc(cx, cy, L*scale, 0, Math.PI*2); ctx.stroke();
+        }
+        
+        function togglePendulum() {
+            pendRunning = !pendRunning;
+            document.getElementById('pend-toggle').textContent = pendRunning ? '⏸ Pause' : '▶ Start';
+            
+            if (pendRunning) {
+                let startTime = Date.now() / 1000;
+                function animate() {
+                    if (!pendRunning) return;
+                    const t = Date.now() / 1000 - startTime;
+                    drawPendulumFrame(t);
+                    pendAnim = requestAnimationFrame(animate);
+                }
+                animate();
+            } else {
+                cancelAnimationFrame(pendAnim);
+            }
+        }
+        
+        // ===== COLLISION =====
+        let colAnim = null;
+        function simulateCollision() {
+            const m1 = parseFloat(document.getElementById('col-m1').value);
+            const v1 = parseFloat(document.getElementById('col-v1').value);
+            const m2 = parseFloat(document.getElementById('col-m2').value);
+            const v2 = parseFloat(document.getElementById('col-v2').value);
+            
+            const v1f = ((m1-m2)*v1 + 2*m2*v2) / (m1+m2);
+            const v2f = ((m2-m1)*v2 + 2*m1*v1) / (m1+m2);
+            const ke = 0.5*m1*v1f*v1f + 0.5*m2*v2f*v2f;
+            const p = m1*v1f + m2*v2f;
+            
+            document.getElementById('col-v1f').textContent = v1f.toFixed(2);
+            document.getElementById('col-v2f').textContent = v2f.toFixed(2);
+            document.getElementById('col-ke').textContent = ke.toFixed(2);
+            document.getElementById('col-p').textContent = p.toFixed(2);
+            document.getElementById('col-result').classList.add('show');
+            
+            const canvas = document.getElementById('colCanvas');
+            const ctx = canvas.getContext('2d');
+            let x1 = 100, x2 = 400;
+            const r1 = 20 + m1*3, r2 = 20 + m2*3;
+            
+            if (colAnim) cancelAnimationFrame(colAnim);
+            
+            function draw() {
+                ctx.clearRect(0, 0, 600, 200);
+                ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 600, 200);
+                
+                ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(0, 170); ctx.lineTo(600, 170); ctx.stroke();
+                
+                let collided = false;
+                if (Math.abs(x1 - x2) < (r1 + r2)) collided = true;
+                
+                if (!collided) {
+                    x1 += v1 * 0.5;
+                    x2 += v2 * 0.5;
+                } else {
+                    x1 += v1f * 0.5;
+                    x2 += v2f * 0.5;
+                }
+                
+                ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(x1, 170-r1, r1, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#3b82f6'; ctx.beginPath(); ctx.arc(x2, 170-r2, r2, 0, Math.PI*2); ctx.fill();
+                
+                ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
+                ctx.fillText('m=' + m1, x1-15, 170-r1-25);
+                ctx.fillText('m=' + m2, x2-15, 170-r2-25);
+                
+                if (x1 > -50 && x1 < 650 && x2 > -50 && x2 < 650) {
+                    colAnim = requestAnimationFrame(draw);
+                }
+            }
+            draw();
+        }
+        
+        function resetCollision() {
+            if (colAnim) cancelAnimationFrame(colAnim);
+            document.getElementById('col-result').classList.remove('show');
+            const canvas = document.getElementById('colCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 600, 200);
+        }
+        
+        // ===== GRAVITY =====
+        function calculateGravity() {
+            const G = 6.674e-11;
+            const m1 = parseFloat(document.getElementById('grav-m1').value);
+            const m2 = parseFloat(document.getElementById('grav-m2').value);
+            const r = parseFloat(document.getElementById('grav-r').value);
+            
+            const F = G * m1 * m2 / (r*r);
+            const g = G * m1 / (r*r);
+            const U = -G * m1 * m2 / r;
+            
+            document.getElementById('grav-f').textContent = F.toExponential(2);
+            document.getElementById('grav-g').textContent = g.toExponential(2);
+            document.getElementById('grav-u').textContent = U.toExponential(2);
+            document.getElementById('grav-result').classList.add('show');
+            
+            const canvas = document.getElementById('gravCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 400, 400);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 400, 400);
+            
+            const cx = 200, cy = 200;
+            const r1 = 20 + Math.log10(m1) * 5;
+            const r2 = 20 + Math.log10(m2) * 5;
+            
+            ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(cx-80, cy, r1, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#3b82f6'; ctx.beginPath(); ctx.arc(cx+80, cy, r2, 0, Math.PI*2); ctx.fill();
+            
+            ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)'; ctx.lineWidth = 1;
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                ctx.beginPath();
+                ctx.moveTo(cx-80 + r1*Math.cos(angle), cy + r1*Math.sin(angle));
+                ctx.lineTo(cx+80 - r2*Math.cos(angle), cy - r2*Math.sin(angle));
+                ctx.stroke();
+            }
+        }
+        
+        // ===== THERMODYNAMICS =====
+        function updateGasType() {
+            calculateGas();
+        }
+        
+        function calculateGas() {
+            const R = 8.314;
+            const p = parseFloat(document.getElementById('gas-p').value);
+            const V = parseFloat(document.getElementById('gas-v').value);
+            const T = parseFloat(document.getElementById('gas-t').value);
+            const n = parseFloat(document.getElementById('gas-n').value);
+            const cv = parseFloat(document.getElementById('gas-type').value);
+            
+            const U = n * cv * T;
+            const W = p * V * Math.log(V/0.0224);
+            const Q = U + W;
+            
+            document.getElementById('gas-u').textContent = U.toFixed(2);
+            document.getElementById('gas-w').textContent = W.toFixed(2);
+            document.getElementById('gas-q').textContent = Q.toFixed(2);
+            document.getElementById('gas-result').classList.add('show');
+            
+            const canvas = document.getElementById('gasCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 400, 400);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 400, 400);
+            
+            ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let v = 0.01; v <= 0.1; v += 0.001) {
+                const pv = n * R * T;
+                const px = 50 + v * 3000;
+                const py = 350 - (pv/v) * 0.002;
+                if (v === 0.01) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+            
+            ctx.fillStyle = '#f59e0b'; ctx.beginPath();
+            ctx.arc(50 + V * 3000, 350 - p * 0.002, 6, 0, Math.PI*2); ctx.fill();
+            
+            ctx.fillStyle = '#64748b'; ctx.font = '12px sans-serif';
+            ctx.fillText('V', 380, 370); ctx.fillText('P', 30, 30);
+        }
+        
+        function updateCarnot() {
+            const t1 = parseFloat(document.getElementById('carnot-t1').value);
+            const t2 = parseFloat(document.getElementById('carnot-t2').value);
+            document.getElementById('carnot-t1-val').textContent = t1;
+            document.getElementById('carnot-t2-val').textContent = t2;
+            calculateCarnot();
+        }
+        
+        function calculateCarnot() {
+            const t1 = parseFloat(document.getElementById('carnot-t1').value);
+            const t2 = parseFloat(document.getElementById('carnot-t2').value);
+            const q1 = parseFloat(document.getElementById('carnot-q1').value);
+            
+            const eff = (1 - t2/t1) * 100;
+            const w = q1 * (1 - t2/t1);
+            const q2 = q1 - w;
+            
+            document.getElementById('carnot-eff').textContent = eff.toFixed(1);
+            document.getElementById('carnot-w').textContent = w.toFixed(0);
+            document.getElementById('carnot-q2').textContent = q2.toFixed(0);
+            
+            const canvas = document.getElementById('carnotCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 400, 400);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 400, 400);
+            
+            ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(80, 320); ctx.lineTo(320, 320);
+            ctx.lineTo(320, 80); ctx.lineTo(80, 80); ctx.closePath();
+            ctx.stroke();
+            
+            ctx.fillStyle = '#ef4444'; ctx.font = '14px sans-serif';
+            ctx.fillText('Q₁ (Hot)', 150, 60);
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillText('Q₂ (Cold)', 150, 350);
+            ctx.fillStyle = '#10b981';
+            ctx.fillText('W = ' + w.toFixed(0) + ' J', 330, 200);
+            
+            ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(320, 200); ctx.lineTo(380, 200); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(380, 190); ctx.lineTo(380, 210); ctx.stroke();
+        }
+        
+        function updateHeatMode() {
+            const mode = document.getElementById('heat-mode').value;
+            const formula = document.getElementById('heat-formula');
+            if (mode === 'conduction') {
+                formula.innerHTML = "Q̇ = k·A·ΔT/d (Fourier's Law)";
+            } else if (mode === 'convection') {
+                formula.innerHTML = "Q̇ = h·A·ΔT (Newton's Law)";
+            } else {
+                formula.innerHTML = "Q̇ = εσA·T⁴ (Stefan-Boltzmann)";
+            }
+        }
+        
+        function calculateHeat() {
+            const mode = document.getElementById('heat-mode').value;
+            const k = parseFloat(document.getElementById('heat-k').value);
+            const A = parseFloat(document.getElementById('heat-a').value);
+            const d = parseFloat(document.getElementById('heat-d').value);
+            const dt = parseFloat(document.getElementById('heat-dt').value);
+            
+            let q;
+            if (mode === 'conduction') {
+                q = k * A * dt / d;
+            } else if (mode === 'convection') {
+                q = k * A * dt;
+            } else {
+                const sigma = 5.67e-8;
+                const T = dt + 273;
+                q = sigma * A * Math.pow(T, 4);
+            }
+            
+            document.getElementById('heat-q').textContent = q.toFixed(2);
+            document.getElementById('heat-flux').textContent = (q/A).toFixed(2);
+            document.getElementById('heat-result').classList.add('show');
+            
+            const canvas = document.getElementById('heatCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 400, 300);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 400, 300);
+            
+            const grad = ctx.createLinearGradient(50, 0, 350, 0);
+            grad.addColorStop(0, '#ef4444');
+            grad.addColorStop(1, '#3b82f6');
+            ctx.fillStyle = grad;
+            ctx.fillRect(50, 120, 300, 60);
+            
+            ctx.fillStyle = '#fff'; ctx.font = '14px sans-serif';
+            ctx.fillText('T₁ = ' + (300+dt) + 'K', 60, 110);
+            ctx.fillText('T₂ = 300K', 300, 110);
+            ctx.fillText('Q̇ = ' + q.toFixed(1) + ' W', 160, 210);
+        }
+ 
+      // ===== ELECTROMAGNETISM =====
+        function calculateEField() {
+            const k = 8.99e9;
+            const q = parseFloat(document.getElementById('ef-q').value) * 1e-6;
+            const r = parseFloat(document.getElementById('ef-r').value);
+            
+            const E = k * Math.abs(q) / (r*r);
+            const V = k * q / r;
+            const F = E * 1e-6;
+            
+            document.getElementById('ef-e').textContent = E.toExponential(2);
+            document.getElementById('ef-v').textContent = V.toFixed(2);
+            document.getElementById('ef-f').textContent = F.toExponential(2);
+            document.getElementById('ef-result').classList.add('show');
+            
+            const canvas = document.getElementById('efCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 400, 400);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 400, 400);
+            
+            const cx = 200, cy = 200;
+            const color = q > 0 ? '#ef4444' : '#3b82f6';
+            
+            ctx.fillStyle = color; ctx.beginPath(); ctx.arc(cx, cy, 15, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.font = '20px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText(q > 0 ? '+' : '-', cx, cy+7);
+            
+            for (let i = 0; i < 12; i++) {
+                const angle = (i / 12) * Math.PI * 2;
+                const startR = 25, endR = 180;
+                const sx = cx + startR * Math.cos(angle);
+                const sy = cy + startR * Math.sin(angle);
+                const ex = cx + endR * Math.cos(angle);
+                const ey = cy + endR * Math.sin(angle);
+                
+                ctx.strokeStyle = q > 0 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(59, 130, 246, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(sx, sy);
+                ctx.lineTo(ex, ey);
+                ctx.stroke();
+                
+                const arrowR = 160;
+                const ax = cx + arrowR * Math.cos(angle);
+                const ay = cy + arrowR * Math.sin(angle);
+                const headSize = 6;
+                const dir = q > 0 ? 1 : -1;
+                
+                ctx.fillStyle = q > 0 ? '#ef4444' : '#3b82f6';
+                ctx.beginPath();
+                ctx.moveTo(ax, ay);
+                ctx.lineTo(ax - headSize * Math.cos(angle - 0.3 * dir), ay - headSize * Math.sin(angle - 0.3 * dir));
+                ctx.lineTo(ax - headSize * Math.cos(angle + 0.3 * dir), ay - headSize * Math.sin(angle + 0.3 * dir));
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            ctx.fillStyle = '#64748b'; ctx.font = '12px sans-serif'; ctx.textAlign = 'left';
+            ctx.fillText('E = ' + E.toExponential(2) + ' N/C', 10, 30);
+            ctx.fillText('V = ' + V.toFixed(2) + ' V', 10, 50);
+        }
+        
+        // ===== CIRCUIT =====
+        function calculateCircuit() {
+            const v = parseFloat(document.getElementById('circ-v').value);
+            const r1 = parseFloat(document.getElementById('circ-r1').value);
+            const r2 = parseFloat(document.getElementById('circ-r2').value);
+            const r3 = parseFloat(document.getElementById('circ-r3').value);
+            const config = document.getElementById('circ-config').value;
+            
+            let rTotal, iTotal, pTotal;
+            if (config === 'series') {
+                rTotal = r1 + r2 + r3;
+                iTotal = v / rTotal;
+                pTotal = v * iTotal;
+            } else {
+                rTotal = 1 / (1/r1 + 1/r2 + 1/r3);
+                iTotal = v / rTotal;
+                pTotal = v * iTotal;
+            }
+            
+            document.getElementById('circ-rtotal').textContent = rTotal.toFixed(2);
+            document.getElementById('circ-itotal').textContent = iTotal.toFixed(2);
+            document.getElementById('circ-ptotal').textContent = pTotal.toFixed(2);
+            document.getElementById('circ-result').classList.add('show');
+            
+            const canvas = document.getElementById('circCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 600, 300);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 600, 300);
+            
+            if (config === 'series') {
+                ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.moveTo(50, 150); ctx.lineTo(100, 150); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(100, 140); ctx.lineTo(100, 160); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(110, 130); ctx.lineTo(110, 170); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(110, 150); ctx.lineTo(550, 150); ctx.stroke();
+                
+                const rx = [200, 350, 500];
+                rx.forEach((x, i) => {
+                    ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 150); ctx.lineTo(x+10, 130); ctx.lineTo(x+20, 170);
+                    ctx.lineTo(x+30, 130); ctx.lineTo(x+40, 170); ctx.lineTo(x+50, 150);
+                    ctx.stroke();
+                    ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
+                    ctx.fillText('R' + (i+1) + '=' + [r1,r2,r3][i] + 'Ω', x+10, 120);
+                });
+                
+                ctx.beginPath(); ctx.moveTo(550, 150); ctx.lineTo(550, 250); ctx.lineTo(50, 250); ctx.lineTo(50, 150); ctx.stroke();
+                ctx.fillStyle = '#10b981'; ctx.font = '14px sans-serif';
+                ctx.fillText('I = ' + iTotal.toFixed(2) + ' A', 280, 280);
+            } else {
+                ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.moveTo(50, 150); ctx.lineTo(100, 150); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(100, 140); ctx.lineTo(100, 160); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(110, 130); ctx.lineTo(110, 170); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(110, 150); ctx.lineTo(550, 150); ctx.stroke();
+                
+                const rx = [200, 350, 500];
+                rx.forEach((x, i) => {
+                    ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(x, 150); ctx.lineTo(x, 200); ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(x-25, 200); ctx.lineTo(x-15, 220); ctx.lineTo(x-5, 180);
+                    ctx.lineTo(x+5, 220); ctx.lineTo(x+15, 180); ctx.lineTo(x+25, 200);
+                    ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(x, 200); ctx.lineTo(x, 250); ctx.stroke();
+                    ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
+                    ctx.fillText('R' + (i+1) + '=' + [r1,r2,r3][i] + 'Ω', x-20, 175);
+                });
+                
+                ctx.beginPath(); ctx.moveTo(550, 150); ctx.lineTo(550, 250); ctx.lineTo(50, 250); ctx.lineTo(50, 150); ctx.stroke();
+                ctx.fillStyle = '#10b981'; ctx.font = '14px sans-serif';
+                ctx.fillText('I_total = ' + iTotal.toFixed(2) + ' A', 280, 280);
+            }
+        }
+        
+        // ===== WAVE OPTICS =====
+        let waveAnim = null, waveRunning = false;
+        function updateWave() {
+            const A = parseFloat(document.getElementById('wave-a').value);
+            const f = parseFloat(document.getElementById('wave-f').value);
+            const lambda = parseFloat(document.getElementById('wave-l').value);
+            const v = f * lambda;
+            
+            document.getElementById('wave-a-val').textContent = A.toFixed(1);
+            document.getElementById('wave-f-val').textContent = f.toFixed(1);
+            document.getElementById('wave-l-val').textContent = lambda.toFixed(1);
+            document.getElementById('wave-v').textContent = v.toFixed(2);
+            
+            if (!waveRunning) drawWaveFrame(0);
+        }
+        
+        function drawWaveFrame(time) {
+            const canvas = document.getElementById('waveCanvas');
+            const ctx = canvas.getContext('2d');
+            const A = parseFloat(document.getElementById('wave-a').value);
+            const f = parseFloat(document.getElementById('wave-f').value);
+            const lambda = parseFloat(document.getElementById('wave-l').value);
+            const k = 2 * Math.PI / lambda;
+            const omega = 2 * Math.PI * f;
+            
+            ctx.clearRect(0, 0, 600, 300);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 600, 300);
+            
+            ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(0, 150); ctx.lineTo(600, 150); ctx.stroke();
+            
+            ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let x = 0; x <= 600; x += 1) {
+                const y = 150 + A * 30 * Math.sin(k * x * 0.1 - omega * time * 0.5);
+                if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            
+            ctx.fillStyle = '#ef4444'; ctx.font = '10px sans-serif';
+            for (let n = 0; n < 10; n++) {
+                const nx = (n * lambda / 2) * 10;
+                if (nx < 600) {
+                    ctx.beginPath(); ctx.arc(nx, 150, 3, 0, Math.PI*2); ctx.fill();
+                    ctx.fillText('N', nx-5, 140);
+                }
+            }
+            
+            ctx.fillStyle = '#10b981';
+            for (let n = 0; n < 10; n++) {
+                const ax = ((n + 0.5) * lambda / 2) * 10;
+                if (ax < 600) {
+                    ctx.beginPath(); ctx.arc(ax, 150 - A*30, 3, 0, Math.PI*2); ctx.fill();
+                    ctx.fillText('A', ax-5, 150 - A*30 - 10);
+                }
+            }
+        }
+        
+        function toggleWave() {
+            waveRunning = !waveRunning;
+            document.getElementById('wave-toggle').textContent = waveRunning ? '⏸ Pause' : '▶ Animate';
+            
+            if (waveRunning) {
+                let startTime = Date.now() / 1000;
+                function animate() {
+                    if (!waveRunning) return;
+                    const t = Date.now() / 1000 - startTime;
+                    drawWaveFrame(t);
+                    waveAnim = requestAnimationFrame(animate);
+                }
+                animate();
+            } else {
+                cancelAnimationFrame(waveAnim);
+            }
+        }
+        
+        function calculateInterference() {
+            const lambda = parseFloat(document.getElementById('int-l').value) * 1e-9;
+            const d = parseFloat(document.getElementById('int-d').value) * 1e-3;
+            const L = parseFloat(document.getElementById('int-L').value);
+            const n = parseInt(document.getElementById('int-n').value);
+            
+            const yBright = n * lambda * L / d;
+            const yDark = (n + 0.5) * lambda * L / d;
+            const fringeSpacing = lambda * L / d;
+            
+            document.getElementById('int-bright').textContent = (yBright * 1000).toFixed(2);
+            document.getElementById('int-dark').textContent = (yDark * 1000).toFixed(2);
+            document.getElementById('int-spacing').textContent = (fringeSpacing * 1000).toFixed(2);
+            document.getElementById('int-result').classList.add('show');
+            
+            const canvas = document.getElementById('intCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 400, 400);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 400, 400);
+            
+            ctx.fillStyle = '#f59e0b'; 
+            ctx.fillRect(50, 140, 10, 10);
+            ctx.fillRect(50, 250, 10, 10);
+            ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
+            ctx.fillText('S₁', 35, 148); ctx.fillText('S₂', 35, 258);
+            
+            ctx.fillStyle = '#334155'; ctx.fillRect(350, 50, 5, 300);
+            
+            const patternScale = 200;
+            for (let y = 50; y < 350; y++) {
+                const dist = Math.abs(y - 200);
+                const intensity = Math.pow(Math.cos(Math.PI * d * dist / (lambda * L * patternScale)), 2);
+                const brightness = Math.floor(intensity * 255);
+                ctx.fillStyle = `rgb(${brightness}, ${brightness}, ${brightness})`;
+                ctx.fillRect(355, y, 40, 1);
+            }
+            
+            ctx.fillStyle = '#ef4444'; ctx.font = '12px sans-serif';
+            ctx.fillText('Bright: ' + (yBright*1000).toFixed(2) + ' mm', 200, 30);
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillText('Dark: ' + (yDark*1000).toFixed(2) + ' mm', 200, 380);
+        }
+        
+        // ===== QUANTUM =====
+        function calculatePhotoelectric() {
+            const h = 6.626e-34;
+            const c = 3e8;
+            const phi = parseFloat(document.getElementById('photo-phi').value) * 1.6e-19;
+            const lambda = parseFloat(document.getElementById('photo-l').value) * 1e-9;
+            
+            const E = h * c / lambda;
+            const ke = Math.max(0, E - phi);
+            const f0 = phi / h;
+            const lambda0 = c / f0;
+            
+            document.getElementById('photo-e').textContent = (E / 1.6e-19).toFixed(2);
+            document.getElementById('photo-ke').textContent = (ke / 1.6e-19).toFixed(2);
+            document.getElementById('photo-f0').textContent = (f0 / 1e14).toFixed(2);
+            document.getElementById('photo-l0').textContent = (lambda0 * 1e9).toFixed(2);
+            document.getElementById('photo-result').classList.add('show');
+            
+            const canvas = document.getElementById('photoCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 400, 300);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 400, 300);
+            
+            ctx.fillStyle = '#64748b'; ctx.fillRect(50, 150, 100, 80);
+            ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
+            ctx.fillText('Metal (φ=' + document.getElementById('photo-phi').value + 'eV)', 55, 180);
+            
+            ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(300, 100); ctx.lineTo(150, 190); ctx.stroke();
+            ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(300, 100, 8, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.font = '10px sans-serif';
+            ctx.fillText('hν', 310, 95);
+            
+            if (ke > 0) {
+                ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(150, 190); ctx.lineTo(80, 80); ctx.stroke();
+                ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.arc(80, 80, 5, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#10b981'; ctx.font = '10px sans-serif';
+                ctx.fillText('e⁻', 65, 75);
+            } else {
+                ctx.fillStyle = '#ef4444'; ctx.font = '12px sans-serif';
+                ctx.fillText('No emission (E < φ)', 200, 200);
+            }
+        }
+        
+        function calculateBohr() {
+            const n = parseInt(document.getElementById('bohr-n').value);
+            const Z = parseInt(document.getElementById('bohr-z').value);
+            const E1 = -13.6;
+            
+            const En = E1 * Z * Z / (n * n);
+            const r = 0.529 * n * n / Z;
+            const v = 2.188e6 * Z / n;
+            const lambda = 1240 / Math.abs(En);
+            
+            document.getElementById('bohr-e').textContent = En.toFixed(2);
+            document.getElementById('bohr-r').textContent = r.toFixed(3);
+            document.getElementById('bohr-v').textContent = (v / 1e6).toFixed(2);
+            document.getElementById('bohr-l').textContent = lambda.toFixed(2);
+            document.getElementById('bohr-result').classList.add('show');
+            
+            const canvas = document.getElementById('bohrCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 400, 400);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 400, 400);
+            
+            const cx = 200, cy = 200;
+            
+            ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('+' + Z + 'e', cx, cy+4);
+            
+            for (let i = 1; i <= 4; i++) {
+                const orbitR = 30 + i * 35;
+                ctx.strokeStyle = i === n ? '#06b6d4' : 'rgba(100, 116, 139, 0.3)';
+                ctx.lineWidth = i === n ? 2 : 1;
+                ctx.beginPath(); ctx.arc(cx, cy, orbitR, 0, Math.PI*2); ctx.stroke();
+                ctx.fillStyle = '#64748b'; ctx.font = '10px sans-serif';
+                ctx.fillText('n=' + i, cx + orbitR + 5, cy);
+            }
+            
+            const orbitR = 30 + n * 35;
+            ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.arc(cx + orbitR, cy, 6, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#10b981'; ctx.font = '10px sans-serif';
+            ctx.fillText('e⁻', cx + orbitR + 10, cy);
+        }
+        
+        // ===== RELATIVITY =====
+        function calculateRelativity() {
+            const c = 3e8;
+            const v = parseFloat(document.getElementById('rel-v').value) * c;
+            const gamma = 1 / Math.sqrt(1 - v*v/(c*c));
+            
+            const t0 = parseFloat(document.getElementById('rel-t0').value);
+            const l0 = parseFloat(document.getElementById('rel-l0').value);
+            const m0 = parseFloat(document.getElementById('rel-m0').value);
+            
+            const t = gamma * t0;
+            const l = l0 / gamma;
+            const m = gamma * m0;
+            const ke = (gamma - 1) * m0 * c * c;
+            
+            document.getElementById('rel-gamma').textContent = gamma.toFixed(4);
+            document.getElementById('rel-t').textContent = t.toFixed(4);
+            document.getElementById('rel-l').textContent = l.toFixed(4);
+            document.getElementById('rel-m').textContent = m.toFixed(4);
+            document.getElementById('rel-ke').textContent = (ke / 1e13).toFixed(2);
+            document.getElementById('rel-result').classList.add('show');
+            
+            const canvas = document.getElementById('relCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 400, 300);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 400, 300);
+            
+            ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;
+            ctx.strokeRect(50, 80, 100, 60);
+            ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
+            ctx.fillText('Rest Frame', 60, 75);
+            ctx.fillText('L₀=' + l0 + 'm', 60, 120);
+            ctx.fillText('t₀=' + t0 + 's', 60, 140);
+            
+            const contractedW = 100 / gamma;
+            ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 2;
+            ctx.strokeRect(200, 80, contractedW, 60);
+            ctx.fillStyle = '#06b6d4'; ctx.font = '12px sans-serif';
+            ctx.fillText('Moving Frame', 210, 75);
+            ctx.fillText('L=' + l.toFixed(2) + 'm', 210, 120);
+            ctx.fillText('t=' + t.toFixed(2) + 's', 210, 140);
+            
+            ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(200, 170); ctx.lineTo(200 + (v/c)*150, 170); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(200 + (v/c)*150, 160); ctx.lineTo(200 + (v/c)*150, 180); ctx.stroke();
+            ctx.fillStyle = '#f59e0b'; ctx.font = '12px sans-serif';
+            ctx.fillText('v = ' + (v/c).toFixed(2) + 'c', 220, 200);
+        }
+        
+      
+# The initialization is corrupted. Let me reconstruct the ENTIRE end of the file
+# from calculateRelativity() through the closing tags, with proper formatting
+
+with open('/mnt/agents/upload/index.html', 'r') as f:
+    original = f.read()
+
+# Cut off everything from calculateRelativity() onward and replace with clean code
+cut_point = original.rfind('function calculateRelativity()')
+if cut_point < 0:
+    cut_point = original.rfind('// ===== RELATIVITY =====')
+
+print(f"Cut point: {cut_point}")
+print(f"Text around cut: {repr(original[cut_point:cut_point+100])}")
+
+# Take everything before the relativity function
+base = original[:cut_point]
+
+# Now add the clean relativity function + initialization + closing tags
+ending = '''        // ===== RELATIVITY =====
+        function calculateRelativity() {
+            const c = 3e8;
+            const v = parseFloat(document.getElementById('rel-v').value) * c;
+            const gamma = 1 / Math.sqrt(1 - v*v/(c*c));
+            
+            const t0 = parseFloat(document.getElementById('rel-t0').value);
+            const l0 = parseFloat(document.getElementById('rel-l0').value);
+            const m0 = parseFloat(document.getElementById('rel-m0').value);
+            
+            const t = gamma * t0;
+            const l = l0 / gamma;
+            const m = gamma * m0;
+            const ke = (gamma - 1) * m0 * c * c;
+            
+            document.getElementById('rel-gamma').textContent = gamma.toFixed(4);
+            document.getElementById('rel-t').textContent = t.toFixed(4);
+            document.getElementById('rel-l').textContent = l.toFixed(4);
+            document.getElementById('rel-m').textContent = m.toFixed(4);
+            document.getElementById('rel-ke').textContent = (ke / 1e13).toFixed(2);
+            document.getElementById('rel-result').classList.add('show');
+            
+            const canvas = document.getElementById('relCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 400, 300);
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 400, 300);
+            
+            ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;
+            ctx.strokeRect(50, 80, 100, 60);
+            ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
+            ctx.fillText('Rest Frame', 60, 75);
+            ctx.fillText('L₀=' + l0 + 'm', 60, 120);
+            ctx.fillText('t₀=' + t0 + 's', 60, 140);
+            
+            const contractedW = 100 / gamma;
+            ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 2;
+            ctx.strokeRect(200, 80, contractedW, 60);
+            ctx.fillStyle = '#06b6d4'; ctx.font = '12px sans-serif';
+            ctx.fillText('Moving Frame', 210, 75);
+            ctx.fillText('L=' + l.toFixed(2) + 'm', 210, 120);
+            ctx.fillText('t=' + t.toFixed(2) + 's', 210, 140);
+            
+            ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(200, 170); ctx.lineTo(200 + (v/c)*150, 170); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(200 + (v/c)*150, 160); ctx.lineTo(200 + (v/c)*150, 180); ctx.stroke();
+            ctx.fillStyle = '#f59e0b'; ctx.font = '12px sans-serif';
+            ctx.fillText('v = ' + (v/c).toFixed(2) + 'c', 220, 200);
+        }
+        
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePendulum();
+            updateWave();
+            updateHeatMode();
+        });
+    </script>
+</body>
+</html>
+
